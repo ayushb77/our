@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Message - Login</title>
+    <!-- Google Font - Dancing Script -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Dancing Script', cursive;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #f8e5e1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-style: normal; /* Ensure font style is normal */
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+            position: relative;
+        }
+        h2 {
+            color: #f28db4;
+            font-family: 'Dancing Script', cursive;
+            margin-bottom: 30px;
+            font-size: 32px; /* Larger font size for the title */
+            font-style: normal; /* Ensure font style is normal */
+        }
+        label {
+            font-size: 16px; /* Larger font size for labels */
+            margin-bottom: 12px;
+            display: block;
+            color: #f28db4;
+            font-style: normal; /* Ensure font style is normal */
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            border: 1px solid #f28db4;
+            border-radius: 4px;
+            font-size: 18px; /* Larger font size for input fields */
+            color: #333;
+            font-style: normal; /* Ensure font style is normal */
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #f28db4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px; /* Larger font size for the button */
+            cursor: pointer;
+            margin-top: 15px;
+            font-style: normal; /* Ensure font style is normal */
+        }
+        button:hover {
+            background-color: #f14f69;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+            font-style: normal; /* Ensure font style is normal */
+        }
+        .heart-icon {
+            font-size: 50px; /* Larger heart icon size */
+            color: #f14f69;
+            margin-top: 20px;
+        }
+        .message {
+            margin-bottom: 15px;
+            font-size: 20px; /* Larger font size for messages */
+            font-style: normal; /* Ensure font style is normal */
+        }
+        .message.ayush {
+            color: blue;  /* Ayush's messages will be blue */
+        }
+        .message.pretty {
+            color: red;  /* Pretty's messages will be red */
+        }
+        #noMessages {
+            font-size: 18px; /* Larger font size for "No messages yet" */
+            font-style: normal; /* Ensure font style is normal */
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Page -->
+<div class="login-container" id="login-container">
+    <h2>Our Message</h2>
+    <form id="loginForm" onsubmit="return validateLogin()">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="Enter username" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Enter password" required>
+
+        <button type="submit">Login</button>
+        
+        <div class="error" id="error-message"></div>
+    </form>
+    <div class="heart-icon">💖</div>
+</div>
+
+<!-- Message Page -->
+<div class="login-container" id="message-container" style="display:none;">
+    <h2>Our Messages</h2>
+    <div id="messages"></div>
+    <div id="noMessages" style="display: none;">No messages yet.</div>
+    
+    <textarea id="messageInput" placeholder="Write a message..." rows="6" style="width:100%; font-size: 18px; font-style: normal;"></textarea>
+    <button onclick="sendMessage()">Send Message</button>
+    
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+    // Simulated login validation
+    function validateLogin() {
+        let username = document.getElementById('username').value.trim();
+        let password = document.getElementById('password').value.trim();
+        let errorMessage = document.getElementById('error-message');
+
+        // Clear previous error messages
+        errorMessage.textContent = '';
+
+        // Simulating basic validation for "Ayush" and "Pretty"
+        if ((username === 'Ayush' || username === 'Pretty') && password === 'password123') {
+            // Store the logged-in user's name in localStorage
+            localStorage.setItem('loggedInUser', username);
+            // Show the message page and hide the login page
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('message-container').style.display = 'block';
+            // Display the messages
+            displayMessages();
+            return false; // Prevent form submission
+        } else {
+            // Show error message if login fails
+            errorMessage.textContent = 'Invalid username or password!';
+            return false; // Prevent form submission
+        }
+    }
+
+    // Function to logout
+    function logout() {
+        // Remove the logged-in user from localStorage
+        localStorage.removeItem('loggedInUser');
+        // Hide message page and show login page
+        document.getElementById('message-container').style.display = 'none';
+        document.getElementById('login-container').style.display = 'block';
+    }
+
+    // Function to display messages
+    function displayMessages() {
+        const messagesContainer = document.getElementById('messages');
+        const noMessagesDiv = document.getElementById('noMessages');
+        const messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+        messagesContainer.innerHTML = ''; // Clear current messages
+
+        if (messages.length === 0) {
+            noMessagesDiv.style.display = 'block';  // Show "No messages yet"
+        } else {
+            noMessagesDiv.style.display = 'none';  // Hide "No messages yet" if there are messages
+            messages.forEach((messageObj) => {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                
+                // Add a class to distinguish between Ayush and Pretty
+                if (messageObj.from === 'Ayush') {
+                    messageDiv.classList.add('ayush');
+                } else if (messageObj.from === 'Pretty') {
+                    messageDiv.classList.add('pretty');
+                }
+
+                messageDiv.innerHTML = `<strong>${messageObj.from}</strong>: ${messageObj.message}`;
+                messagesContainer.appendChild(messageDiv);
+            });
+        }
+    }
+
+    // Function to send a message
+    function sendMessage() {
+        const loggedInUser = localStorage.getItem('loggedInUser');
+        const messageInput = document.getElementById('messageInput').value.trim();
+        
+        if (messageInput === '') {
+            alert('Please write a message!');
+            return;
+        }
+
+        const messageObj = {
+            from: loggedInUser,
+            message: messageInput
+        };
+
+        // Get messages from localStorage
+        const messages = JSON.parse(localStorage.getItem('messages')) || [];
+        
+        // Add the new message
+        messages.push(messageObj);
+
+        // Save updated messages to localStorage
+        localStorage.setItem('messages', JSON.stringify(messages));
+
+        // Display the updated messages
+        displayMessages();
+
+        // Clear the message input field
+        document.getElementById('messageInput').value = '';
+    }
+</script>
+
+</body>
+</html>
